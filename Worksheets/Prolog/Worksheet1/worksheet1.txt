@@ -1,0 +1,73 @@
+1.a) Made family.pl.
+  b) i. | ?- female(haley).
+        yes
+     ii. | ?- male(gil).
+         no
+     iii. | ?- parent(frank,phil).
+          yes
+     iv. | ?- parent(X,claire).
+         X = dede ? ;
+         X = jay ? ;
+         no
+     v. | ?- parent(gloria,X).
+        X = joe ? ;
+        X = manny ? ;
+        no
+     vi. | ?- parent(jay, X), parent(X,Y).
+         X = claire,
+         Y = haley ? ;
+         X = claire,
+         Y = alex ? ;
+         X = claire,
+         Y = luke ? ;
+         X = mitchell,
+         Y = lily ? ;
+         X = mitchell,
+         Y = rexford ? ;
+         no
+     vii. | ?- parent(X,Y),parent(Y,lily).
+          X = dede,
+          Y = mitchell ? ;
+          X = jay,
+          Y = mitchell ? ;
+          X = barb,
+          Y = cameron ? ;
+          X = merle,
+          Y = cameron ? ;
+          no
+     viii. | ?- parent(alex,X).
+           no
+     ix. | ?- parent(X, luke), parent(X,Y).
+         X = phil,
+         Y = haley ? ;
+         X = phil,
+         Y = alex ? ;
+         X = phil,
+         Y = luke ? ;
+         X = claire,
+         Y = haley ? ;
+         X = claire,
+         Y = alex ? ;
+         X = claire,
+         Y = luke ? ;
+         no
+  c) Updated family.pl
+  d) | ?- cousins(haley, lily).
+     true ? ;
+     true ? 
+     yes
+     
+     | ?- father(X,luke).
+     X = phil ? ;
+     no
+
+     | ?- uncle(X, lily).
+     X = joe ? ;
+     no
+e) married(Person1, Person2, Year).
+   divorced(Person1, Person2, Year).
+   married(jay, gloria, 2008).
+   married(jay, dede, 1968).
+   divorced(jay, dede, 2003).
+
+ 

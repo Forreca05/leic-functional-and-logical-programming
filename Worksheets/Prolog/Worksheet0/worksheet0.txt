@@ -4,6 +4,7 @@
       iii.true? yes
           true? ; no
       iv. no
+      
 2.a)- created and loaded file animals.pl
   b)- i.
       ii. lives_in(X, forest).
