@@ -1,0 +1,17 @@
+1. a) X=1 X=2 
+   b) X=1 Y=1; X=1 Y=2; X=2 Y=1; X=2 Y=2
+   c) X=1 Y=1; X=1 Y=2
+
+2. a) one
+      two
+      three
+      five
+      no
+   b) one
+      no
+   c) one-one
+      one-two
+      one-three
+      no
+
+3. All red except the last one.

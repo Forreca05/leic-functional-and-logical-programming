@@ -1,0 +1,4 @@
+1. a)True b)Syntax Error c)True d)True e)True
+   f)True g)False h)True i)True j)True k)True l)True
+
+2. Made in file.pl.
