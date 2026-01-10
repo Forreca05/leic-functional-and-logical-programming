@@ -15,3 +15,4 @@
       no
 
 3. Only immature is red. The others are mutually exclusive, a person cannot be a spider and a person at the same time.
+4,5,6. some exercises done in file.pl

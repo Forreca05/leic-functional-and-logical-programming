@@ -1,1 +1,4 @@
 1. Done in file.pl
+3. Done in file.pl
+6. Done in games.pl.
+
