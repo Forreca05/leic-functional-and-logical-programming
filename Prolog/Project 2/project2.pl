@@ -4,10 +4,10 @@
 colors([green, yellow, blue, orange, white, black]).
 
 consecutive(X,Y,Board) :-
-	append(Prefix,[X,Y|Suffix], Board).
+	append(_,[X,Y|_], Board).
 
 spaced(X,Y,Board):-
-	append(Prefix,[X,_,Y|Suffix],Board);
+	append(_,[X,_,Y|_],Board);
 	append([X],[_,_,_,Y,_],Board);
 	append([_,X],[_,_,_,Y],Board).
 
@@ -20,7 +20,7 @@ acrossed(X,Y,Board):-
 	append([_,X],[_,_,Y,_],Board).
 
 same(X,Y,Board):-
-	append([X,Y],Suffix,Board);
+	append([X,Y],_,Board);
 	append([_,_,_],[X,Y,_],Board);
 	append([_,_,_],[X,_,Y],Board);
 	append([_,_,_],[_,X,Y],Board).
@@ -32,7 +32,7 @@ next_to(X,Y,[A,B,C,D,E,F]) :-
 	consecutive(Y,X,[A,B,C,D,E,F]).
 
 anywhere(X,[A,B,C,D,E,F]):-
-	append(Prefix,[X|Suffix],[A,B,C,D,E,F]).
+	append(_,[X|_],[A,B,C,D,E,F]).
 
 one_space(X,X,_).
 one_space(X,Y,[A,B,C,D,E,F]):-
@@ -53,7 +53,7 @@ same_edge(X,Y,[A,B,C,D,E,F]):-
 	same(Y,X,[A,B,C,D,E,F]).
 
 position(_, [], _) :- fail.
-position(X, [H|L], Board) :-
+position(X, [H|_], Board) :-
     nth1(H, Board, X), !.
 position(X, [_|L], Board) :-
     position(X, L, Board).
@@ -67,18 +67,42 @@ check([H|T], Board):-
     call(H, Board),
     check(T, Board).
 
-solve(Constraints, Board) :-
+solve(Constraints, Board):-
     board(Board),
     check(Constraints, Board).
 
+count_satisfied([], _, 0).
+count_satisfied([H|T], Board, N) :-
+    (   call(H, Board)
+    ->  count_satisfied(T, Board, N1),
+        N is N1 + 1
+    ;   count_satisfied(T, Board, N)
+    ).
 
+board_score(Constraints, Board, Score) :-
+    count_satisfied(Constraints, Board, Score).
 
+best_score(Constraints, BestScore) :-
+    findall(
+        S,
+        ( board(Board),
+          board_score(Constraints, Board, S)
+        ),
+        Scores
+    ),
+    max_member(MaxSatisfied, Scores),
+    length(Constraints, Total),
+    BestScore is MaxSatisfied - Total.   %or just MaxSatisfied - 6.
 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %:- use_module(library(lists)).
+
+% member(X, [X|_]).
+% member(X, [_|T]) :-
+%    member(X, T).
 
 % permutation(ListaOriginal, ListaPermutada)
 
