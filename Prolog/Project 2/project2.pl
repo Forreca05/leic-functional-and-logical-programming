@@ -102,6 +102,50 @@ best_score(Constraints, BestScore) :-
 
 % asserta(FactOrRule) Adiciona um facto ou cláusula no início da base de conhecimento.
 % retract(FactOrRule) Remove da base de conhecimento um facto ou uma cláusula que unifica com o argumento.
+
+/*
+predZ:-
+read(X),
+X =.. [_|B],
+length(B, N),
+write(N), nl.
+
+Lê um termo Prolog do utilizador
+
+Conta quantos argumentos ele tem
+*/
+
+/*
+Mantendo duplicados:
+uniao([], L, L).
+uniao([H|T], L, [H|R]) :-
+    uniao(T, L, R).
+
+intersecao([], _, []).
+intersecao([H|T], L, [H|R]) :-
+    member(H, L),
+    intersecao(T, L, R).
+intersecao([_|T], L, R) :-
+    intersecao(T, L, R).
+
+Sem duplicados:
+uniao_set([], L, L).
+uniao_set([H|T], L, R) :-
+    member(H, L),
+    uniao_set(T, L, R).
+uniao_set([H|T], L, [H|R]) :-
+    \+ member(H, L),
+    uniao_set(T, L, R).
+
+intersecao_set([], _, []).
+intersecao_set([H|T], L, [H|R]) :-
+    member(H, L),
+    \+ member(H, R),
+    intersecao_set(T, L, R).
+intersecao_set([_|T], L, R) :-
+    intersecao_set(T, L, R).
+*/
+
 /*
 \+ G significa:
 
@@ -785,4 +829,196 @@ pretty_print2([A,B|Rest]):-
 	-> (write('.'),nl)
 	; (write(','),nl),pretty_print2(Rest)).
 
+*/
+
+/*
+TESTE 22/23
+
+:-use_module(library(lists)).
+
+% dish(Name, Price, IngredientGrams).
+dish(pizza, 2200, [cheese-300, tomato-350]).
+dish(ratatouille, 2200, [tomato-70, eggplant-150, garlic-50]).
+dish(garlic_bread, 1060, [cheese-50, garlic-200]).
+
+:- dynamic ingredient/2.
+
+% ingredient(Name, CostPerGram).
+ingredient(cheese, 4).
+ingredient(tomato, 2).
+ingredient(eggplant, 7).
+ingredient(garlic, 6).
+
+%Exercise 1
+count_ingredients(Dish,Num):-
+	dish(Dish,_,Ingredients),
+	length(Ingredients,Num).
+
+%Exercise 2
+ingredient_amount_cost(Ingredient,Grams,TotalCost):-
+	ingredient(Ingredient,Price),
+	TotalCost is Price * Grams.
+
+%Exercise 3
+get_ingredients([],Price,Price):-!.
+get_ingredients([Ingredient-Grams|T],Aux,Price):-
+	ingredient_amount_cost(Ingredient,Grams,Cost),
+	NewAux is Cost + Aux,
+	get_ingredients(T,NewAux,Price).
+	
+dish_profit(Dish,Profit):-
+	dish(Dish,Price,Ingredients),
+	get_ingredients(Ingredients,0,Price2),
+	Profit is Price - Price2.
+
+%Exercise 4
+update_unit_cost(Ingredient,New):-
+	retract(ingredient(Ingredient,_Price)),
+	assert(ingredient(Ingredient,New)).
+
+%Exercise 5
+most_expensive_dish(Dish, Price) :-
+    dish(Dish, Price, _),
+    \+ (
+        dish(_, Price2, _),
+        Price2 > Price
+    ).
+
+%Exercise 6- no recursion
+consume_ingredient(Stocks,Ingredient,Grams,New):-
+	member(Ingredient-Total,Stocks),
+	Total >= Grams,
+	NewTotal is Total - Grams,
+	select(Ingredient-Total, Stocks, Ingredient-NewTotal, New).
+
+%Exercise 7
+count_dishes_with_ingredient(Ingredient,N):-
+	count_dishes_with_ingredient_aux(Ingredient,[],0,N).
+count_dishes_with_ingredient_aux(_, Visited, Aux, Aux) :-
+	\+ ( dish(Name, _, _), \+ member(Name, Visited) ).
+count_dishes_with_ingredient_aux(Ingredient,Visited,Aux,N):-
+	dish(Name,_Price,Ingredients),
+	member(Ingredient-_Total,Ingredients),
+	\+ member(Name,Visited),
+	Aux1 is Aux + 1,
+	count_dishes_with_ingredient_aux(Ingredient,[Name|Visited],Aux1,N).
+count_dishes_with_ingredient_aux(Ingredient,Visited,Aux,N):-
+	dish(Name,_Price,Ingredients),
+	\+ member(Ingredient-_,Ingredients),
+	\+ member(Name,Visited),
+	count_dishes_with_ingredient_aux(Ingredient,[Name|Visited],Aux,N).
+
+%Exercise 8
+formalize([],[]).
+formalize([A-_|T],[A|Rest]):-
+	formalize(T,Rest).
+get_ingredientslist(Dish,List):-
+	dish(Dish,_,IList),
+	formalize(IList,List).
+list_dishes(DishIngredients) :-
+    setof(Dish-List,
+          get_ingredientslist(Dish, List),
+          DishIngredients).
+
+%Exercise 9
+most_lucrative_dishes(Dishes) :-
+    findall(Profit-Dish, dish_profit(Dish, Profit), Pairs),
+    keysort(Pairs, SortedAsc),
+    reverse(SortedAsc, SortedDesc),
+    extract_dishes(SortedDesc, Dishes).
+
+extract_dishes([], []).
+extract_dishes([_-Dish | T], [Dish | Rest]) :-
+    extract_dishes(T, Rest).
+
+% G1
+edge(g1, br, o).
+edge(g1, br, ni).
+edge(g1, o, ni).
+edge(g1, o, c).
+edge(g1, o, h).
+edge(g1, h, c).
+edge(g1, h, n).
+edge(g1, n, he).
+edge(g1, c, he).
+
+% G2
+edge(g2, br, h).
+edge(g2, br, ni).
+edge(g2, h, ni).
+edge(g2, h, o).
+edge(g2, h, c).
+edge(g2, o, c).
+edge(g2, o, n).
+edge(g2, n, he).
+edge(g2, c, he).
+edge(g2, cl, he).
+
+%Exercise 21
+common_edges(G1,G2,L):-
+	setof(A-B,(edge(G1,A,B),edge(G2,A,B);edge(G1,A,B),edge(G2,B,A)),L).
+
+%Exercise 22
+% Arestas comuns entre G1 e G2
+common_edges(G1, G2, L) :-
+    setof(A-B,
+        (edge(G1, A, B), edge(G2, A, B) ;
+         edge(G1, A, B), edge(G2, B, A)),
+        L), !.
+common_edges(_, _, []).
+
+% Encontra todos os vértices ligados a um vértice inicial
+grow(_, [], Acc, Acc).
+grow(Edges, [V|Rest], Acc, Final) :-
+    findall(N,
+        (member(V-X, Edges), N = X ; member(X-V, Edges), N = X),
+        Neigh),
+    subtract_list(Neigh, Acc, New),   % apenas remove duplicados
+    append(Rest, New, Queue),
+    append(Acc, New, Acc2),
+    grow(Edges, Queue, Acc2, Final).
+
+% subtract_list(List, Remove, Result) — versão simples
+subtract_list([], _, []).
+subtract_list([H|T], R, Out) :-
+    member(H, R), !,
+    subtract_list(T, R, Out).
+subtract_list([H|T], R, [H|Out]) :-
+    subtract_list(T, R, Out).
+
+% Extrai componentes conexos
+components([], _, []).
+components([V|Vs], Edges, [C|Rest]) :-
+    grow(Edges, [V], [V], C),
+    subtract_list(Vs, C, Remaining),
+    components(Remaining, Edges, Rest).
+
+% Predicado principal
+common_subgraphs(G1, G2, Subgraphs) :-
+    common_edges(G1, G2, Edges),
+    findall(X, (member(A-B, Edges), (X=A ; X=B)), Vs0),
+    sort(Vs0, Vertices),
+    components(Vertices, Edges, Subgraphs).
+*/
+
+
+
+/*
++ INPUT
+- OUTPUT
+? IN/OUT
+
+GROUND- THERE ARE NO VARIABLES IN THE TERM
+UNGROUND-
+
+X / Y-FLOAT QUOTIENT
+X // Y-INTEGER QUOTIENT,TRUNCATED TOWARDS 0
+X div Y-INTEGER QUOTIENT(ROUNDED DOWN)
+X rem Y-INTEGER REMAINDER: X-Y*(X//Y)
+X mod Y-INTEGER REMAINDER: X-Y*(X div Y)
+
+RED CUT INFLUENCES THE RESULT
+GREEN CUT ONLY INCREASE EFFICIENCY
+
+A = 4+2 UNIFIES A WITH THE TERM +(4,2), NOT THE VALUE 6
 */

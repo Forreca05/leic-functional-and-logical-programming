@@ -12,4 +12,53 @@ flight(madrid, london, iberia, ib3166, 1550, 145).
 flight(london, madrid, iberia, ib3163, 1030, 140).
 flight(porto, frankfurt, lufthansa, lh1177, 1230, 165).
 
-get_all_nodes
+uniao_set([], L, L).
+uniao_set([H|T], L, R) :-
+    member(H, L),
+    uniao_set(T, L, R).
+uniao_set([H|T], L, [H|R]) :-
+    \+ member(H, L),
+    uniao_set(T, L, R).
+
+get_all_nodes(List):-
+	setof(Origin,A^B^C^D^E^flight(Origin,A,B,C,D,E),Origins),
+	setof(Destination,A^B^C^D^E^flight(A,Destination,B,C,D,E),Destinations),
+	uniao_set(Origins,Destinations,List).
+
+company_cities(Company, Cities) :-
+    setof(City,
+          A^B^C^D^E^(
+              flight(A, B, Company, C, D, E),
+              (City = A ; City = B)
+          ),
+          Cities).
+
+company_city_count(Company, Count) :-
+    company_cities(Company, Cities),
+    length(Cities, Count).
+
+max_city_count(Max) :-
+    setof(Count,
+          C^company_city_count(C, Count),
+          Counts),
+    last(Counts, Max).
+
+most_diversified(Company) :-
+    max_city_count(Max),
+    company_city_count(Company, Max).
+
+
+find_flights(Origin, Destination, Flights) :-
+    dfs(Origin, Destination, [Origin], Flights).
+dfs(Destination, Destination, _, []).
+dfs(Current, Destination, Visited, [Code|Rest]) :-
+    flight(Current, Next, _, Code, _, _),
+    \+ member(Next, Visited),
+    dfs(Next, Destination, [Next|Visited], Rest).
+
+find_all_flights(Origin, Destination, ListOfFlights) :-
+    findall(Flights,
+            find_flights(Origin, Destination, Flights),
+            ListOfFlights).
+
+	
